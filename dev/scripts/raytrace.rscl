@@ -1,0 +1,88 @@
+func solve(a, b, c) {
+  return [(-1 * b + sqrt(pow(b, 2) - 4 * a * c)) / (2 * a), (-1 * b - sqrt(pow(b, 2) - 4 * a * c)) / (2 * a)];
+}
+
+func mul(s, v) {
+  return [s * v[0], s * v[1], s * v[2]];
+}
+
+func add(v, w) {
+  return [v[0] + w[0], v[1] + w[1], v[2] + w[2]];
+}
+
+func sub(v, w) {
+  return add(v, mul(-1, w));
+}
+
+func dot(v, w) {
+  return v[0] * w[0] + v[1] * w[1] + v[2] * w[2];
+}
+
+func norm(v) {
+  return sqrt(pow(v[0], 2) + pow(v[1], 2) + pow(v[2], 2));
+}
+
+func normalize(v) {
+  return mul(1 / norm(v), v);
+}
+
+func min(a, b){
+  return if a > b { b } else { a };
+}
+
+func constrain(value, minValue, maxValue) {
+  return if value < minValue { minValue } else { if value > maxValue { maxValue } else { value } }
+}
+
+func checker(x, z) {
+  return constrain(6 * sin((x * pi) / 4) * cos((z * pi) / 4), 0, 1);
+}
+
+func briFloor(x, z) {
+  return constrain((1000 * checker(x, z)) / pow(z, 2), 0, 1);
+}
+
+func briFilm(l, m) {
+  let w = normalize([l, m, 1]);
+  let c = [0, 1, 10];
+  let r = 2;
+  let a = solve(dot(w, w), 2 * dot(w, mul(-1, c)), dot(c, c) - pow(r, 2));
+  let s = min(a[0], a[1]);
+  let sw = mul(s, w);
+ 
+  if is_nan(s) {
+    if 3 / m > -5 / m {
+      return briFloor((l * 3) / m, 3 / m);
+    } else {
+      return briFloor((l * 5) / m, -5 / m);
+    }
+  };
+  
+  let n = normalize(sub(sw, c));
+  let b = add(sw, mul(dot(mul(-2, sw), n), n));
+
+  let u = [(3 - dot([0, 1, 0], sw)) / dot([0, 1, 0], b), (5 - dot([0, -1, 0], sw)) / dot([0, -1, 0], b)];
+
+  let k = if u[0] > u[1] { u[0] } else { u[1] };
+  let v = add(sw, mul(k, b));
+  return briFloor(v[0], v[2]);
+}
+
+func print_density(d) {
+  let scale = ["M","W","N","$","@","%","#","&","B","8","9","E","G","A","6","m","K","5","H","R","k","b","Y","T","4","3","V","0","J","L","7","g","p","a","s","e","y","x","z","n","o","c","v","?","j","I","f","t","r","1","l","i","*","=","-","~","^","`","'",":",";",",","."," "];
+  puts(scale[floor((255 - d) / 4)] + " ");
+}
+
+func draw(width, height, pixel_size) {
+  for y in 0 to height step pixel_size {
+    for x in 0 to width step pixel_size {
+      let l = x / width - 1 / 2;
+      let m = y / height - 1 / 2;
+      print_density(255 * briFilm(l, m));
+    }
+    puts("\n");
+  }
+}
+
+
+draw(250, 250, 1);

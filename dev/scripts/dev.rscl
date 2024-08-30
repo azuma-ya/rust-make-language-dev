@@ -1,0 +1,10 @@
+let test = [1,5,3,4];
+
+func dev(arr, i){
+  print(arr[i]);
+}
+
+for i in 0 to 4 {
+  dev(test, i);
+}
+
